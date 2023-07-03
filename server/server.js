@@ -21,8 +21,6 @@ app.get('/', async (req, res) => {
   })
 })
 
-const { Configuration, OpenAIApi } = require("openai");
-
 app.post('/', async (req, res) => {
   try {
     const prompt = req.body.prompt;
