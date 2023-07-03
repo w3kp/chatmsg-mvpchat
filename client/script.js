@@ -86,10 +86,10 @@ const handleSubmit = async (e) => {
     // messageDiv.innerHTML = "..."
     loader(messageDiv)
 
-    let localhostAPI = `http://localhost:5001`
-    // let renderAPI = `https://codex-im0y.onrender.com/`
+    // let localhostAPI = `http://localhost:5001`
+    let renderAPI = `https://chatmsg-mvpapi.onrender.com`
 
-    const response = await fetch(localhostAPI, {
+    const response = await fetch(renderAPI, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
