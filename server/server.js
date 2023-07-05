@@ -51,7 +51,7 @@ const setViberWebhook = () => {
   const webhookUrl = `${process.env.TARGET_API_URL}${WEBHOOK_URL_PATH}`;
 
   const fetch = async () => {
-    axios.post('https://chatapi.viber.com/pa/set_webhook', {
+    axios.post(`${process.env.VIBER_API_URL}/set_webhook`, {
       "auth_token": viberAuthToken,
       "url": webhookUrl,
       "event_types": [
@@ -84,6 +84,7 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
   if (event === 'message') {
     const senderId = req.body.sender.id;
     const messageText = req.body.message.text;
+
     try {
       const response = await axios.post(process.env.TARGET_API_URL, req.body);
       // Send a message back to the user
