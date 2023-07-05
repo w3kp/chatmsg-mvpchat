@@ -1,4 +1,5 @@
 import express from 'express'
+import axios from 'axios';
 import * as dotenv from 'dotenv'
 import cors from 'cors'
 import { Configuration, OpenAIApi } from 'openai'
@@ -15,11 +16,78 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+const WEBHOOK_URL_PATH = '/vb/hook/cb';
+
+const setViberWebhook = () => {
+  const viberAuthToken = process.env.VIBER_AUTH_TOKEN; // Your Viber auth token
+  const webhookUrl = `${process.env.TARGET_API_URL}${WEBHOOK_URL_PATH}`;
+
+  const fetch = async () => {
+    axios.post('https://chatapi.viber.com/pa/set_webhook', {
+      "auth_token": viberAuthToken,
+      "url": webhookUrl,
+      "event_types": [
+        "delivered",
+        "seen",
+        "failed",
+        "subscribed",
+        "unsubscribed",
+        "conversation_started",
+        "message"
+      ],
+      "send_name": true,
+      "send_photo": true
+    }, {
+      headers: { 'Content-Type': 'application/json' }
+    }).then(response => {
+        console.log('Webhook set successfully');
+    }).catch(error => {
+        console.error('Failed to set webhook', error);
+    });
+  }
+  fetch();
+}
+
+app.post(WEBHOOK_URL_PATH, async (req, res) => {
+  const event = req.body.event;
+  
+  // Here, we're assuming that chat messages come in with an event type of 'message'
+  if (event === 'message') {
+    try {
+      const response = await axios.post(process.env.TARGET_API_URL, req.body);
+      // Send a message back to the user
+      const messageResponse = await axios.post(`${process.env.VIBER_API_URL}/send_message`, {
+        receiver: senderId,
+        min_api_version: 1,
+        sender: {
+          name: "Chatmsg Guru",
+          avatar: "https://i.pravatar.cc/150?img=63" // Change to your bot's avatar URL
+        },
+        tracking_data: "tracking data",
+        type: "text",
+        text: "Thank you for your message!" // Change to your desired response message
+      }, {
+        headers: {
+          'X-Viber-Auth-Token': process.env.VIBER_AUTH_TOKEN,
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log(messageResponse)
+      res.status(200).send('Webhook processed successfully');
+    } catch (err) {
+      console.error('Error while forwarding to target API', err);
+      res.status(500).send('Error while forwarding to target API');
+    }
+  } else {
+    res.status(200).send('Webhook processed successfully');
+  }
+});
+
 app.get('/', async (req, res) => {
   res.status(200).send({
     message: 'Hello from CodeX!'
   })
-})
+});
 
 app.post('/', async (req, res) => {
   try {
@@ -45,4 +113,7 @@ app.post('/', async (req, res) => {
   }
 })
 
-app.listen(5001, () => console.log('AI server started on http://localhost:5001'))
+app.listen(5001, () => {
+  console.log('AI server started on http://localhost:5001');
+  setViberWebhook();
+})
