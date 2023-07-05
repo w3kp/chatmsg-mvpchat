@@ -18,34 +18,6 @@ app.use(express.json())
 
 const WEBHOOK_URL_PATH = '/vb/hook/cb';
 
-// const setupChatBase = () => {
-//   const fetch = require('node-fetch');
-
-//   const url = 'https://www.chatbase.co/api/v1/chat';
-//   const options = {
-//     method: 'POST',
-//     headers: {
-//       accept: 'application/json',
-//       'content-type': 'application/json',
-//       authorization: 'Bearer 5490468b-88be-4557-8afb-5cfef0715586'
-//     },
-//     body: JSON.stringify({
-//       messages: [{role: 'user', content: 'Hi'}],
-//       stream: false,
-//       temperature: 0,
-//       model: 'gpt-3.5-turbo',
-//       chatbotId: 'DnPFpteoiEbc0jO4LorgM'
-//     })
-//   };
-
-//   fetch(url, options)
-//     .then(res => res.json())
-//     .then(json => console.log(json))
-//     .catch(err => console.error('error:' + err));
-
-//   axios.post()
-// }
-
 const setViberWebhook = () => {
   const viberAuthToken = process.env.VIBER_AUTH_TOKEN; // Your Viber auth token
   const webhookUrl = `${process.env.TARGET_API_URL}${WEBHOOK_URL_PATH}`;
@@ -73,12 +45,12 @@ const setViberWebhook = () => {
         console.error('Failed to set webhook', error);
     });
   }
+
   fetch();
 }
 
 app.post(WEBHOOK_URL_PATH, async (req, res) => {
   const event = req.body.event;
-  console.log(req.body);
   
   // Here, we're assuming that chat messages come in with an event type of 'message'
   if (event === 'message') {
@@ -86,9 +58,24 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
     const messageText = req.body.message.text;
 
     try {
-      const response = await axios.post(process.env.TARGET_API_URL, req.body);
+      // Ask answer to our chatbot
+      const answer = axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({
+        messages: [{role: 'user', content: messageText}],
+        stream: false,
+        temperature: 0,
+        model: 'gpt-3.5-turbo',
+        chatbotId: 'DnPFpteoiEbc0jO4LorgM'
+      }), {
+        headers: {
+          accept: 'application/json',
+          'content-type': 'application/json',
+          authorization: `Bearer ${CHATBASE_AUTH_TOKEN}`
+        }
+      })
+      console.log('chatbase call ended');
+      console.log(answer)
       // Send a message back to the user
-      const messageResponse = await axios.post(`${process.env.VIBER_API_URL}/send_message`, {
+      await axios.post(`${process.env.VIBER_API_URL}/send_message`, {
         receiver: senderId,
         min_api_version: 1,
         sender: {
@@ -97,15 +84,14 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
         },
         tracking_data: "tracking data",
         type: "text",
-        text: "Thank you for your message!" // Change to your desired response message
+        text: answer.text // Change to your desired response message
       }, {
         headers: {
           'X-Viber-Auth-Token': process.env.VIBER_AUTH_TOKEN,
           'Content-Type': 'application/json'
         }
       });
-      console.log({messageText});
-      console.log({messageResponse});
+
       res.status(200).send('Webhook setting up webhook - processed successfully');
     } catch (err) {
       console.error('Error while forwarding to target API', err);
