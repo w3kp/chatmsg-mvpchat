@@ -69,7 +69,7 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
         headers: {
           accept: 'application/json',
           'content-type': 'application/json',
-          authorization: `Bearer ${CHATBASE_AUTH_TOKEN}`
+          authorization: `Bearer ${process.env.CHATBASE_AUTH_TOKEN}`
         }
       })
       console.log('chatbase call ended');
