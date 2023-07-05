@@ -53,6 +53,8 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
   
   // Here, we're assuming that chat messages come in with an event type of 'message'
   if (event === 'message') {
+    const senderId = req.body.sender.id;
+    const messageText = req.body.message.text;
     try {
       const response = await axios.post(process.env.TARGET_API_URL, req.body);
       // Send a message back to the user
@@ -72,7 +74,8 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(messageResponse);
+      console.log({messageText});
+      console.log({messageResponse});
       res.status(200).send('Webhook setting up webhook - processed successfully');
     } catch (err) {
       console.error('Error while forwarding to target API', err);
