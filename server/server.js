@@ -84,7 +84,7 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
         },
         tracking_data: "tracking data",
         type: "text",
-        text: answer.text // Change to your desired response message
+        text: answer.data.text // send replied message by chatbot
       }, {
         headers: {
           'X-Viber-Auth-Token': process.env.VIBER_AUTH_TOKEN,
