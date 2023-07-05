@@ -73,7 +73,6 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
         }
       })
       console.log('chatbase call ended');
-      console.log(answer)
       // Send a message back to the user
       await axios.post(`${process.env.VIBER_API_URL}/send_message`, {
         receiver: senderId,
