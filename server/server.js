@@ -18,6 +18,34 @@ app.use(express.json())
 
 const WEBHOOK_URL_PATH = '/vb/hook/cb';
 
+// const setupChatBase = () => {
+//   const fetch = require('node-fetch');
+
+//   const url = 'https://www.chatbase.co/api/v1/chat';
+//   const options = {
+//     method: 'POST',
+//     headers: {
+//       accept: 'application/json',
+//       'content-type': 'application/json',
+//       authorization: 'Bearer 5490468b-88be-4557-8afb-5cfef0715586'
+//     },
+//     body: JSON.stringify({
+//       messages: [{role: 'user', content: 'Hi'}],
+//       stream: false,
+//       temperature: 0,
+//       model: 'gpt-3.5-turbo',
+//       chatbotId: 'DnPFpteoiEbc0jO4LorgM'
+//     })
+//   };
+
+//   fetch(url, options)
+//     .then(res => res.json())
+//     .then(json => console.log(json))
+//     .catch(err => console.error('error:' + err));
+
+//   axios.post()
+// }
+
 const setViberWebhook = () => {
   const viberAuthToken = process.env.VIBER_AUTH_TOKEN; // Your Viber auth token
   const webhookUrl = `${process.env.TARGET_API_URL}${WEBHOOK_URL_PATH}`;
@@ -50,6 +78,7 @@ const setViberWebhook = () => {
 
 app.post(WEBHOOK_URL_PATH, async (req, res) => {
   const event = req.body.event;
+  console.log(req.body);
   
   // Here, we're assuming that chat messages come in with an event type of 'message'
   if (event === 'message') {
