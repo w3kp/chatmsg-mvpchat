@@ -59,7 +59,7 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
 
     try {
       // Ask answer to our chatbot
-      const answer = axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({
+      const answer = await axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({
         messages: [{role: 'user', content: messageText}],
         stream: false,
         temperature: 0,
