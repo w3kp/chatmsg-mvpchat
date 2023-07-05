@@ -72,8 +72,8 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
           'Content-Type': 'application/json'
         }
       });
-      console.log(messageResponse)
-      res.status(200).send('Webhook processed successfully');
+      console.log(messageResponse);
+      res.status(200).send('Webhook setting up webhook - processed successfully');
     } catch (err) {
       console.error('Error while forwarding to target API', err);
       res.status(500).send('Error while forwarding to target API');
