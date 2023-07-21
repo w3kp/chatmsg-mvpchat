@@ -103,7 +103,8 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
 
 app.get('/', async (req, res) => {
   res.status(200).send({
-    message: 'Hello from CodeX!'
+    message: 'Hello from CodeX!',
+    viberChatUrl: "viber://pa?chatURI=chatmsg"
   })
 });
 
