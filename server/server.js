@@ -64,14 +64,14 @@ app.post(WEBHOOK_URL_PATH, async (req, res) => {
         stream: false,
         temperature: 0,
         model: 'gpt-3.5-turbo',
-        chatbotId: 'DnPFpteoiEbc0jO4LorgM'
+        chatbotId: process.env.CHATBASE_BOT_ID
       }), {
         headers: {
           accept: 'application/json',
           'content-type': 'application/json',
           authorization: `Bearer ${process.env.CHATBASE_AUTH_TOKEN}`
         }
-      })
+      });
       console.log('chatbase call ended');
       // Send a message back to the user
       await axios.post(`${process.env.VIBER_API_URL}/send_message`, {
